@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizControl - Painel Administrativo</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div id="login-screen" class="container auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h1>BizControl Admin</h1>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary">Entrar no Painel</button>
+            </form>
+            <p id="login-error" class="error-msg"></p>
+        </div>
+    </div>
+
+    <div id="admin-dashboard" class="container hidden">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-rocket"></i>
+                <span>Admin Portal</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-page="licenses"><i class="fa-solid fa-key"></i> Licenças</li>
+                <li data-page="stats"><i class="fa-solid fa-chart-line"></i> Estatísticas</li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn-text"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+            </div>
+        </nav>
+
+        <main class="content">
+            <header class="main-header">
+                <h2 id="page-title">Gestão de Licenças</h2>
+                <button id="new-license-btn" class="btn-primary"><i class="fa-solid fa-plus"></i> Nova Licença</button>
+            </header>
+
+            <section id="licenses-page" class="page-content">
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <span class="label">Total</span>
+                        <span id="stat-total" class="value">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="label">Ativas</span>
+                        <span id="stat-active" class="value green">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="label">Bloqueadas</span>
+                        <span id="stat-blocked" class="value red">0</span>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="search-input" placeholder="Buscar por empresa ou chave...">
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Empresa / Chave</th>
+                                <th>Status</th>
+                                <th>Plano</th>
+                                <th>Dispositivo</th>
+                                <th>Expiração</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="licenses-table-body">
+                            <!-- Inserido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Nova Licença -->
+    <div id="modal-license" class="modal hidden">
+        <div class="modal-content">
+            <header>
+                <h3>Criar Nova Licença</h3>
+                <button class="close-modal">&times;</button>
+            </header>
+            <form id="license-form">
+                <div class="form-group">
+                    <label>Nome da Empresa (Opcional)</label>
+                    <input type="text" id="m-company" placeholder="Ex: Mercado Central">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Plano</label>
+                        <select id="m-plan">
+                            <option value="monthly">Mensal</option>
+                            <option value="yearly">Anual</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Expiração</label>
+                        <input type="date" id="m-expiry" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Gerar Chave</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
