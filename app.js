@@ -2,7 +2,7 @@
 const SUPABASE_URL = "https://fumeskdjohvhclnltlnv.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_f6pHS3QKnc6g4IO2VTR9sQ_ZLTHl7Di"; // Você deve pegar a "anon public" no painel
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ESTADO DA APLICAÇÃO
 let currentSession = null;
@@ -16,7 +16,7 @@ const licensesTable = document.getElementById('licenses-table-body');
 
 // INICIALIZAÇÃO
 async function init() {
-    const { data } = await supabase.auth.getSession();
+    const { data } = await supabaseClient.auth.getSession();
     currentSession = data.session;
     
     if (currentSession) {
@@ -33,7 +33,7 @@ loginForm.onsubmit = async (e) => {
     const password = document.getElementById('password').value;
     const errorMsg = document.getElementById('login-error');
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
     if (error) {
         errorMsg.textContent = "Erro ao entrar: " + error.message;
@@ -44,7 +44,7 @@ loginForm.onsubmit = async (e) => {
 };
 
 document.getElementById('logout-btn').onclick = async () => {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     showLogin();
 };
 
@@ -62,7 +62,7 @@ function showDashboard() {
 
 // LOGICA DE LICENÇAS
 async function loadLicenses() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('licenses')
         .select('*')
         .order('created_at', { ascending: false });
@@ -118,7 +118,7 @@ function updateStats() {
 // AÇÕES
 window.toggleBlock = async (key, currentStatus) => {
     const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('licenses')
         .update({ status: newStatus })
         .eq('license_key', key);
@@ -129,7 +129,7 @@ window.toggleBlock = async (key, currentStatus) => {
 
 window.resetDevice = async (key) => {
     if (!confirm("Isso permitirá que a licença seja usada em outro computador. Continuar?")) return;
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('licenses')
         .update({ device_id: null })
         .eq('license_key', key);
@@ -158,7 +158,7 @@ document.getElementById('license-form').onsubmit = async (e) => {
 
     const key = generateKey();
 
-    const { error } = await supabase.from('licenses').insert({
+    const { error } = await supabaseClient.from('licenses').insert({
         license_key: key,
         company_name: company,
         plan: plan,
