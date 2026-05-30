@@ -83,12 +83,14 @@ function renderLicenses() {
     licensesTable.innerHTML = licenses
         .filter(l => 
             (l.company_name || '').toLowerCase().includes(search) || 
+            (l.owner_name || '').toLowerCase().includes(search) ||
             l.license_key.toLowerCase().includes(search)
         )
         .map(l => `
             <tr>
                 <td>
-                    <div style="font-weight:bold">${l.company_name || 'Pendente'}</div>
+                    <div style="font-weight:bold">${l.company_name}</div>
+                    <div style="font-size:0.85rem; color:var(--primary-color)">${l.owner_name || '—'}</div>
                     <div style="font-size:0.8rem; color:var(--text-muted)">${l.license_key}</div>
                 </td>
                 <td><span class="badge badge-${l.status}">${l.status}</span></td>
@@ -177,6 +179,18 @@ document.getElementById('license-form').onsubmit = async (e) => {
 
 function generateKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let k = "";
+    for (let i = 0; i < 16; i++) {
+        if (i > 0 && i % 4 === 0) k += "-";
+        k += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return k;
+}
+
+document.getElementById('search-input').oninput = renderLicenses;
+
+init();
+456789";
     let k = "";
     for (let i = 0; i < 16; i++) {
         if (i > 0 && i % 4 === 0) k += "-";
