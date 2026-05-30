@@ -149,7 +149,9 @@ document.getElementById('new-license-btn').onclick = () => {
     document.getElementById('m-expiry').value = d.toISOString().split('T')[0];
 };
 
-document.querySelector('.close-modal').onclick = () => modal.classList.add('hidden');
+document.querySelectorAll('.close-modal').forEach(btn => {
+    btn.onclick = () => modal.classList.add('hidden');
+});
 
 document.getElementById('license-form').onsubmit = async (e) => {
     e.preventDefault();
