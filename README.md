@@ -28,3 +28,4 @@ Certifique-se de que a `SUPABASE_URL` e a `SUPABASE_ANON_KEY` estão configurada
 ---
 Desenvolvido por BizControl.
 "# adminBizcontrol" 
+"# admin-biz" 
