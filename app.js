@@ -1,6 +1,6 @@
-// CONFIGURAÇÃO SUPABASE (Substitua pelos seus dados se necessário)
+// CONFIGURAÇÃO SUPABASE
 const SUPABASE_URL = "https://fumeskdjohvhclnltlnv.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_f6pHS3QKnc6g4IO2VTR9sQ_ZLTHl7Di"; // Você deve pegar a "anon public" no painel
+const SUPABASE_ANON_KEY = "sb_publishable_f6pHS3QKnc6g4IO2VTR9sQ_ZLTHl7Di";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -144,7 +144,6 @@ window.resetDevice = async (key) => {
 const modal = document.getElementById('modal-license');
 document.getElementById('new-license-btn').onclick = () => {
     modal.classList.remove('hidden');
-    // Set default date to 30 days from now
     const d = new Date();
     d.setDate(d.getDate() + 30);
     document.getElementById('m-expiry').value = d.toISOString().split('T')[0];
@@ -155,6 +154,10 @@ document.querySelector('.close-modal').onclick = () => modal.classList.add('hidd
 document.getElementById('license-form').onsubmit = async (e) => {
     e.preventDefault();
     const company = document.getElementById('m-company').value;
+    const owner = document.getElementById('m-owner').value;
+    const phone = document.getElementById('m-phone').value;
+    const login_email = document.getElementById('m-email').value;
+    const login_password = document.getElementById('m-password').value;
     const plan = document.getElementById('m-plan').value;
     const expiry = document.getElementById('m-expiry').value;
 
@@ -163,6 +166,10 @@ document.getElementById('license-form').onsubmit = async (e) => {
     const { error } = await supabaseClient.from('licenses').insert({
         license_key: key,
         company_name: company,
+        owner_name: owner,
+        phone: phone,
+        login_email: login_email,
+        login_password: login_password,
         plan: plan,
         status: 'pending',
         expires_at: new Date(expiry).toISOString()
@@ -171,7 +178,7 @@ document.getElementById('license-form').onsubmit = async (e) => {
     if (error) {
         alert("Erro ao criar licença: " + error.message);
     } else {
-        alert("Licença criada!\nChave: " + key);
+        alert("Licença e Acesso criados!\n\nChave: " + key + "\nEmail: " + login_email + "\nSenha: " + login_password);
         modal.classList.add('hidden');
         loadLicenses();
     }
@@ -179,18 +186,6 @@ document.getElementById('license-form').onsubmit = async (e) => {
 
 function generateKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let k = "";
-    for (let i = 0; i < 16; i++) {
-        if (i > 0 && i % 4 === 0) k += "-";
-        k += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return k;
-}
-
-document.getElementById('search-input').oninput = renderLicenses;
-
-init();
-456789";
     let k = "";
     for (let i = 0; i < 16; i++) {
         if (i > 0 && i % 4 === 0) k += "-";
