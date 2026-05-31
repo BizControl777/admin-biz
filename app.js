@@ -13,6 +13,11 @@ const loginScreen = document.getElementById('login-screen');
 const dashboard = document.getElementById('admin-dashboard');
 const loginForm = document.getElementById('login-form');
 const licensesTable = document.getElementById('licenses-table-body');
+const historyTable = document.getElementById('history-table-body');
+
+// GRAFICOS
+let statusChart = null;
+let plansChart = null;
 
 // INICIALIZAÇÃO
 async function init() {
@@ -60,6 +65,27 @@ function showDashboard() {
     loadLicenses();
 }
 
+// NAVEGAÇÃO ENTRE PÁGINAS
+document.querySelectorAll('.nav-links li').forEach(li => {
+    li.onclick = () => {
+        const page = li.getAttribute('data-page');
+        
+        // Ativar link no menu
+        document.querySelectorAll('.nav-links li').forEach(item => item.classList.remove('active'));
+        li.classList.add('active');
+        
+        // Trocar seção visível
+        document.querySelectorAll('.page-content').forEach(section => section.classList.add('hidden'));
+        document.getElementById(`${page}-page`).classList.remove('hidden');
+        
+        // Atualizar título
+        const titles = { 'licenses': 'Gestão de Licenças', 'stats': 'Painel de Estatísticas', 'history': 'Histórico de Atividade' };
+        document.getElementById('page-title').textContent = titles[page];
+
+        if (page === 'stats') renderCharts();
+    };
+});
+
 // LOGICA DE LICENÇAS
 async function loadLicenses() {
     const { data, error } = await supabaseClient
@@ -74,14 +100,13 @@ async function loadLicenses() {
 
     licenses = data;
     renderLicenses();
+    renderHistory();
     updateStats();
+    if (!document.getElementById('stats-page').classList.contains('hidden')) renderCharts();
 }
 
 function renderLicenses() {
     const search = document.getElementById('search-input').value.toLowerCase();
-    const now = new Date();
-    const sevenDaysFromNow = new Date();
-    sevenDaysFromNow.setDate(now.getDate() + 7);
     
     licensesTable.innerHTML = licenses
         .filter(l => 
@@ -90,62 +115,80 @@ function renderLicenses() {
             (l.phone || '').toLowerCase().includes(search) ||
             (l.license_key || '').toLowerCase().includes(search)
         )
-        .map(l => {
-            const expiryDate = new Date(l.expires_at);
-            const isExpiringSoon = expiryDate <= sevenDaysFromNow && expiryDate > now;
-            const isExpired = expiryDate <= now;
-            
-            let expiryClass = '';
-            if (isExpired) expiryClass = 'text-danger';
-            else if (isExpiringSoon) expiryClass = 'text-warning';
+        .map(l => `
+            <tr>
+                <td>
+                    <div style="font-weight:bold">${l.company_name}</div>
+                    <div style="font-size:0.85rem; color:var(--primary-color)">${l.owner_name || '—'}</div>
+                    <div style="font-size:0.8rem; color:var(--text-muted)">${l.license_key}</div>
+                </td>
+                <td><span class="badge badge-${l.status}">${l.status}</span></td>
+                <td>${l.plan === 'monthly' ? 'Mensal' : 'Anual'}</td>
+                <td>
+                    ${l.phone ? `<a href="https://wa.me/${l.phone.replace(/\D/g, '')}" target="_blank" style="color:var(--green); text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> ${l.phone}</a>` : '—'}
+                </td>
+                <td>${new Date(l.expires_at).toLocaleDateString()}</td>
+                <td>
+                    <div style="display:flex; gap:5px; flex-wrap:wrap">
+                        <button class="btn-primary btn-sm" style="background:#444" 
+                            onclick="editLicense('${l.id}')">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn-primary btn-sm ${l.status === 'blocked' ? 'btn-green' : 'btn-red'}" 
+                            onclick="toggleBlock('${l.license_key}', '${l.status}')">
+                            ${l.status === 'blocked' ? 'Ativar' : 'Bloquear'}
+                        </button>
+                        <button class="btn-primary btn-sm btn-red" 
+                            onclick="deleteLicense('${l.license_key}', '${l.company_name}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+}
 
-            return `
-                <tr class="${isExpiringSoon ? 'warning-row' : ''}">
-                    <td>
-                        <div style="font-weight:bold">${l.company_name}</div>
-                        <div style="font-size:0.85rem; color:var(--primary-color)">${l.owner_name || '—'}</div>
-                        <div style="font-size:0.8rem; color:var(--text-muted)">${l.license_key}</div>
-                    </td>
-                    <td><span class="badge badge-${l.status}">${l.status}</span></td>
-                    <td>${l.plan === 'monthly' ? 'Mensal' : 'Anual'}</td>
-                    <td>
-                        ${l.phone ? `<a href="https://wa.me/${l.phone.replace(/\D/g, '')}" target="_blank" style="color:var(--green); text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> ${l.phone}</a>` : '—'}
-                    </td>
-                    <td style="font-size:0.85rem">
-                        ${l.last_validation_at ? new Date(l.last_validation_at).toLocaleString() : '<span style="color:var(--text-muted)">Nunca</span>'}
-                        <div style="font-size:0.75rem; color:var(--text-muted)">${l.device_id ? 'Vínculo: ' + l.device_id.substring(0,8) + '...' : 'Sem PC'}</div>
-                    </td>
-                    <td class="${expiryClass}">
-                        ${expiryDate.toLocaleDateString()}
-                        ${isExpiringSoon ? '<br><small>⚠️ Expira em breve</small>' : ''}
-                        ${isExpired ? '<br><small>❌ Expirada</small>' : ''}
-                    </td>
-                    <td style="font-size:0.85rem; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap" title="${l.notes || ''}">
-                        ${l.notes || '—'}
-                    </td>
-                    <td>
-                        <div style="display:flex; gap:5px; flex-wrap:wrap">
-                            <button class="btn-primary btn-sm" style="background:#444" 
-                                onclick="editLicense('${l.id}')">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="btn-primary btn-sm ${l.status === 'blocked' ? 'btn-green' : 'btn-red'}" 
-                                onclick="toggleBlock('${l.license_key}', '${l.status}')">
-                                ${l.status === 'blocked' ? 'Ativar' : 'Bloquear'}
-                            </button>
-                            <button class="btn-primary btn-sm" style="background:#555" 
-                                onclick="resetDevice('${l.license_key}')">
-                                Reset PC
-                            </button>
-                            <button class="btn-primary btn-sm btn-red" 
-                                onclick="deleteLicense('${l.license_key}', '${l.company_name}')">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+function renderHistory() {
+    const now = new Date();
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(now.getDate() + 7);
+
+    historyTable.innerHTML = licenses.map(l => {
+        const expiryDate = new Date(l.expires_at);
+        const isExpiringSoon = expiryDate <= sevenDaysFromNow && expiryDate > now;
+        const isExpired = expiryDate <= now;
+        
+        let expiryClass = '';
+        if (isExpired) expiryClass = 'text-danger';
+        else if (isExpiringSoon) expiryClass = 'text-warning';
+
+        return `
+            <tr class="${isExpiringSoon ? 'warning-row' : ''}">
+                <td>
+                    <div style="font-weight:bold">${l.company_name}</div>
+                    <div style="font-size:0.8rem; color:var(--text-muted)">${l.owner_name}</div>
+                </td>
+                <td>
+                    ${l.last_validation_at ? new Date(l.last_validation_at).toLocaleString() : '<span style="color:var(--text-muted)">Nunca acedeu</span>'}
+                </td>
+                <td style="font-family:monospace; font-size:0.85rem">
+                    ${l.device_id || '<span style="color:var(--text-muted)">Aguardando ativação...</span>'}
+                </td>
+                <td class="${expiryClass}">
+                    ${expiryDate.toLocaleDateString()}
+                    ${isExpiringSoon ? '<br><small>⚠️ Expira em breve</small>' : ''}
+                    ${isExpired ? '<br><small>❌ Expirada</small>' : ''}
+                </td>
+                <td>
+                    ${l.phone ? `
+                        <a href="https://wa.me/${l.phone.replace(/\D/g, '')}" target="_blank" class="btn-primary btn-sm btn-green" style="text-decoration:none; display:inline-block">
+                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                        </a>
+                    ` : 'Sem contacto'}
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function updateStats() {
@@ -153,7 +196,6 @@ function updateStats() {
     document.getElementById('stat-active').textContent = licenses.filter(l => l.status === 'active').length;
     document.getElementById('stat-blocked').textContent = licenses.filter(l => l.status === 'blocked').length;
     
-    // Cálculo financeiro simples (Exemplo: Mensal 10.000 Kz, Anual 100.000 Kz)
     const monthlyPrice = 10000;
     const yearlyPrice = 100000;
     
@@ -163,6 +205,52 @@ function updateStats() {
     }, 0);
     
     document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + " Mzn";
+}
+
+function renderCharts() {
+    const ctxStatus = document.getElementById('chart-status').getContext('2d');
+    const ctxPlans = document.getElementById('chart-plans').getContext('2d');
+
+    if (statusChart) statusChart.destroy();
+    if (plansChart) plansChart.destroy();
+
+    const statusData = {
+        active: licenses.filter(l => l.status === 'active').length,
+        blocked: licenses.filter(l => l.status === 'blocked').length,
+        pending: licenses.filter(l => l.status === 'pending').length,
+        expired: licenses.filter(l => l.status === 'expired').length
+    };
+
+    statusChart = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: ['Ativas', 'Bloqueadas', 'Pendentes', 'Expiradas'],
+            datasets: [{
+                data: [statusData.active, statusData.blocked, statusData.pending, statusData.expired],
+                backgroundColor: ['#00d4aa', '#ff4d4d', '#ffa500', '#8fa3c0'],
+                borderWidth: 0
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#e1e7ef' } } } }
+    });
+
+    const plansData = {
+        monthly: licenses.filter(l => l.plan === 'monthly').length,
+        yearly: licenses.filter(l => l.plan === 'yearly').length
+    };
+
+    plansChart = new Chart(ctxPlans, {
+        type: 'pie',
+        data: {
+            labels: ['Mensal', 'Anual'],
+            datasets: [{
+                data: [plansData.monthly, plansData.yearly],
+                backgroundColor: ['#0088ff', '#9d50bb'],
+                borderWidth: 0
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#e1e7ef' } } } }
+    });
 }
 
 // AÇÕES

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div id="login-screen" class="container auth-container">
@@ -39,6 +40,7 @@
             <ul class="nav-links">
                 <li class="active" data-page="licenses"><i class="fa-solid fa-key"></i> Licenças</li>
                 <li data-page="stats"><i class="fa-solid fa-chart-line"></i> Estatísticas</li>
+                <li data-page="history"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</li>
             </ul>
             <div class="sidebar-footer">
                 <button id="logout-btn" class="btn-text"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
@@ -51,6 +53,7 @@
                 <button id="new-license-btn" class="btn-primary"><i class="fa-solid fa-plus"></i> Nova Licença</button>
             </header>
 
+            <!-- Página de Licenças -->
             <section id="licenses-page" class="page-content">
                 <div class="stats-row">
                     <div class="stat-card">
@@ -83,13 +86,48 @@
                                 <th>Status</th>
                                 <th>Plano</th>
                                 <th>Contacto</th>
-                                <th>Último Acesso</th>
                                 <th>Expiração</th>
-                                <th>Notas</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="licenses-table-body">
+                            <!-- Inserido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Página de Estatísticas -->
+            <section id="stats-page" class="page-content hidden">
+                <div class="stats-grid">
+                    <div class="stat-card chart-container">
+                        <h3>Distribuição de Licenças</h3>
+                        <canvas id="chart-status"></canvas>
+                    </div>
+                    <div class="stat-card chart-container">
+                        <h3>Planos Escolhidos</h3>
+                        <canvas id="chart-plans"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Página de Histórico -->
+            <section id="history-page" class="page-content hidden">
+                <div class="table-container">
+                    <header style="padding: 1.5rem; border-bottom: 1px solid var(--border)">
+                        <h3>Logs de Atividade e Expirações</h3>
+                    </header>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Empresa</th>
+                                <th>Último Acesso (Log)</th>
+                                <th>ID Dispositivo</th>
+                                <th>Expiração / Alerta</th>
+                                <th>Contacto Rápido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
                             <!-- Inserido via JS -->
                         </tbody>
                     </table>
