@@ -134,6 +134,11 @@ body {
 .stat-card .value { font-size: 2rem; font-weight: bold; }
 .stat-card .value.green { color: var(--green); }
 .stat-card .value.red { color: var(--red); }
+.stat-card .value.blue { color: var(--primary); }
+
+.warning-row { background: rgba(255, 165, 0, 0.05); }
+.text-warning { color: #ffa500; font-weight: bold; }
+.text-danger { color: var(--red); font-weight: bold; }
 
 /* Table */
 .table-container {

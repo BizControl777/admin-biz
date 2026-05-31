@@ -65,6 +65,10 @@
                         <span class="label">Bloqueadas</span>
                         <span id="stat-blocked" class="value red">0</span>
                     </div>
+                    <div class="stat-card">
+                        <span class="label">Faturação Prevista (Mês)</span>
+                        <span id="stat-revenue" class="value blue">0 Kz</span>
+                    </div>
                 </div>
 
                 <div class="filter-bar">
@@ -79,8 +83,9 @@
                                 <th>Status</th>
                                 <th>Plano</th>
                                 <th>Contacto</th>
-                                <th>Dispositivo</th>
+                                <th>Último Acesso</th>
                                 <th>Expiração</th>
+                                <th>Notas</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -97,10 +102,11 @@
     <div id="modal-license" class="modal hidden">
         <div class="modal-content">
             <header>
-                <h3>Criar Nova Licença</h3>
+                <h3>Gerir Licença</h3>
                 <button class="close-modal">&times;</button>
             </header>
             <form id="license-form">
+                <input type="hidden" id="m-id">
                 <div class="form-group">
                     <label>Nome da Empresa</label>
                     <input type="text" id="m-company" required placeholder="Ex: Mercado Central">
@@ -138,9 +144,13 @@
                         <input type="date" id="m-expiry" required>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>Notas Administrativas</label>
+                    <textarea id="m-notes" rows="3" placeholder="Notas internas sobre este cliente..." style="width:100%; background:#1c252f; border:1px solid var(--border); border-radius:6px; color:white; padding:0.8rem;"></textarea>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary close-modal">Cancelar</button>
-                    <button type="submit" class="btn-primary">Gerar Licença e Acesso</button>
+                    <button type="submit" id="btn-save-license" class="btn-primary">Gerar Licença e Acesso</button>
                 </div>
             </form>
         </div>
