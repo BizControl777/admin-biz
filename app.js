@@ -172,6 +172,9 @@ function renderHistory() {
         if (isExpired) expiryClass = 'text-danger';
         else if (isExpiringSoon) expiryClass = 'text-warning';
 
+        // Garante que o número de funcionários seja exibido corretamente (0 se nulo)
+        const employeesCount = l.total_employees !== undefined && l.total_employees !== null ? l.total_employees : 0;
+
         return `
             <tr class="${isExpiringSoon ? 'warning-row' : ''}">
                 <td>
@@ -190,7 +193,7 @@ function renderHistory() {
                     ${isExpired ? '<br><small>❌ Expirada</small>' : ''}
                 </td>
                 <td style="font-weight:bold; text-align:center; font-size: 1.1rem; color: var(--primary)">
-                    ${l.total_employees || '0'}
+                    ${employeesCount}
                 </td>
             </tr>
         `;
