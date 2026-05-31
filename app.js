@@ -110,6 +110,10 @@ function renderLicenses() {
                         onclick="resetDevice('${l.license_key}')">
                         Reset PC
                     </button>
+                    <button class="btn-primary btn-sm btn-red" 
+                        onclick="deleteLicense('${l.license_key}', '${l.company_name}')">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </button>
                 </td>
             </tr>
         `).join('');
@@ -142,6 +146,21 @@ window.resetDevice = async (key) => {
 
     if (error) alert("Erro: " + error.message);
     else loadLicenses();
+};
+
+window.deleteLicense = async (key, companyName) => {
+    if (!confirm(`TEM CERTEZA? Esta ação irá eliminar permanentemente a licença da empresa "${companyName}".\n\nEsta ação não pode ser desfeita.`)) return;
+    
+    const { error } = await supabaseClient
+        .from('licenses')
+        .delete()
+        .eq('license_key', key);
+
+    if (error) {
+        alert("Erro ao eliminar licença: " + error.message);
+    } else {
+        loadLicenses();
+    }
 };
 
 // GERAR LICENÇA
