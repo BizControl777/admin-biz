@@ -82,9 +82,19 @@ document.querySelectorAll('.nav-links li').forEach(li => {
         const titles = { 'licenses': 'Gestão de Licenças', 'stats': 'Painel de Estatísticas', 'history': 'Histórico de Atividade' };
         document.getElementById('page-title').textContent = titles[page];
 
+        // Sempre recarregar dados ao trocar de aba para ver atualizações do ERP
+        loadLicenses();
         if (page === 'stats') renderCharts();
     };
 });
+
+document.getElementById('refresh-btn').onclick = () => {
+    const btn = document.getElementById('refresh-btn');
+    btn.innerHTML = '<i class="fa-solid fa-sync fa-spin"></i> Atualizando...';
+    loadLicenses().then(() => {
+        btn.innerHTML = '<i class="fa-solid fa-sync"></i> Recarregar';
+    });
+};
 
 // LOGICA DE LICENÇAS
 async function loadLicenses() {
