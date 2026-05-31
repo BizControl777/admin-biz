@@ -84,6 +84,7 @@ function renderLicenses() {
         .filter(l => 
             (l.company_name || '').toLowerCase().includes(search) || 
             (l.owner_name || '').toLowerCase().includes(search) ||
+            (l.phone || '').toLowerCase().includes(search) ||
             l.license_key.toLowerCase().includes(search)
         )
         .map(l => `
@@ -95,6 +96,9 @@ function renderLicenses() {
                 </td>
                 <td><span class="badge badge-${l.status}">${l.status}</span></td>
                 <td>${l.plan}</td>
+                <td>
+                    ${l.phone ? `<a href="https://wa.me/${l.phone.replace(/\D/g, '')}" target="_blank" style="color:var(--green); text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> ${l.phone}</a>` : '—'}
+                </td>
                 <td style="font-family:monospace; font-size:0.8rem">${l.device_id || '—'}</td>
                 <td>${new Date(l.expires_at).toLocaleDateString()}</td>
                 <td>
