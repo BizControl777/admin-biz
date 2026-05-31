@@ -189,12 +189,8 @@ function renderHistory() {
                     ${isExpiringSoon ? '<br><small>⚠️ Expira em breve</small>' : ''}
                     ${isExpired ? '<br><small>❌ Expirada</small>' : ''}
                 </td>
-                <td>
-                    ${l.phone ? `
-                        <a href="https://wa.me/${l.phone.replace(/\D/g, '')}" target="_blank" class="btn-primary btn-sm btn-green" style="text-decoration:none; display:inline-block">
-                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                        </a>
-                    ` : 'Sem contacto'}
+                <td style="font-weight:bold; text-align:center; font-size: 1.1rem; color: var(--primary)">
+                    ${l.total_employees || '0'}
                 </td>
             </tr>
         `;
@@ -277,6 +273,7 @@ window.editLicense = (id) => {
     document.getElementById('m-plan').value = l.plan;
     document.getElementById('m-expiry').value = new Date(l.expires_at).toISOString().split('T')[0];
     document.getElementById('m-notes').value = l.notes || '';
+    document.getElementById('m-employees').value = l.total_employees || 0;
     
     document.querySelector('#modal-license h3').textContent = "Editar Licença";
     document.getElementById('btn-save-license').textContent = "Atualizar Licença";
@@ -402,8 +399,5 @@ function generateKey() {
 }
 
 document.getElementById('search-input').oninput = renderLicenses;
-
-init();
-ses;
 
 init();
