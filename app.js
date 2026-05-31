@@ -162,7 +162,7 @@ function updateStats() {
         return acc + (l.plan === 'monthly' ? monthlyPrice : yearlyPrice / 12);
     }, 0);
     
-    document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + " Kz";
+    document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + " Mzn";
 }
 
 // AÇÕES
