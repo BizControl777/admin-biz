@@ -145,17 +145,29 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+    align-items: start;
 }
 
 .chart-container {
+    background: var(--bg-card);
     padding: 1.5rem;
-    min-height: 300px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    height: 400px; /* Altura fixa para evitar pulos no layout */
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-container canvas {
+    flex: 1;
+    max-height: 300px; /* Limita a altura do canvas */
 }
 
 .chart-container h3 {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     color: var(--text-muted);
     font-size: 1rem;
+    text-align: center;
 }
 
 @media (max-width: 900px) {
