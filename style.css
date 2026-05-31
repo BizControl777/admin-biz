@@ -264,3 +264,68 @@ input, select {
 .btn-secondary:hover {
     background: rgba(255,255,255,0.1);
 }
+
+/* RESPONSIVIDADE (Mobile) */
+@media (max-width: 768px) {
+    #admin-dashboard {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header {
+        padding: 1rem;
+    }
+
+    .nav-links {
+        display: flex;
+        overflow-x: auto;
+    }
+
+    .nav-links li {
+        padding: 0.8rem 1rem;
+        white-space: nowrap;
+    }
+
+    .sidebar-footer {
+        display: none; /* Esconde logout no mobile ou move para outro lugar se necessário */
+    }
+
+    .content {
+        padding: 1rem;
+    }
+
+    .main-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    /* Tabela Responsiva */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 600px; /* Garante que a tabela não esmague o conteúdo */
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        padding: 1.5rem;
+        margin: 10px;
+    }
+}
