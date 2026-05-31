@@ -331,6 +331,7 @@ document.getElementById('license-form').onsubmit = async (e) => {
     const plan = document.getElementById('m-plan').value;
     const expiry = document.getElementById('m-expiry').value;
     const notes = document.getElementById('m-notes').value;
+    const employees = document.getElementById('m-employees').value;
 
     const payload = {
         company_name: company,
@@ -340,7 +341,8 @@ document.getElementById('license-form').onsubmit = async (e) => {
         login_password: login_password,
         plan: plan,
         expires_at: new Date(expiry).toISOString(),
-        notes: notes
+        notes: notes,
+        total_employees: parseInt(employees) || 0
     };
 
     if (id) {
@@ -400,5 +402,8 @@ function generateKey() {
 }
 
 document.getElementById('search-input').oninput = renderLicenses;
+
+init();
+ses;
 
 init();
